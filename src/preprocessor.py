@@ -3,52 +3,67 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 
-# Load the matrix from the .mtx file
-matrix = mmread("../data/soc-dolphins.mtx").tocsc()  # Convert to a Compressed Sparse Column format
+# carrega a matriz de adjacentes
+matrix = mmread(
+    "../data/soc-dolphins.mtx"
+).tocsc()  # converte para um formato comprimido
 
-# Check if the matrix is square (adjacency matrices are typically square for graphs)
+# checa se tamanho são iguais
 if matrix.shape[0] != matrix.shape[1]:
-    raise ValueError("The matrix should be square to represent a graph adjacency matrix.")
+    raise ValueError(
+        "The matrix should be square to represent a graph adjacency matrix."
+    )
 
-# Create a graph with nodes and edges given by .mtx file.
+# Cria um grafo com nodos e arestas com o arquivo .mtx
 graph = nx.Graph(matrix)
 
-# List the degrees by node
+# Lista os graus de cada nodo
+print("graus dos vértices:")
 for node, degree in graph.degree:
-    print(f"Node: {node + 1}, Degree: {degree}")
+    print(f"Vértice: {node + 1}, Graus: {degree}")
 
-# The number of maximal cliques in G
-print(f"\nThe number of maximal cliques in the graph: {sum(1 for c in nx.find_cliques(graph))}")
+# calcula os números de cliques maximais
+print(f"\nA qtd. de clqiues maximais no grafo:{sum(1 for c in nx.find_cliques(graph))}")
 
-# The largest maximal clique in G
-print(f"\nThe largest maximal clique in the graph: {max(nx.find_cliques(graph), key=len)}")
+# Calcula o clique maximal
+print(f"\nO maior clique no grafo: {max(nx.find_cliques(graph), key=len)}")
 
-# 3d spring layout
+# calcula o coeficiente de algomaração para cada vértice
+clustering_coefficients = nx.clustering(graph)
+
+print("\nCoeficiente de aglomeração de cada vértice:")
+for node, coeff in clustering_coefficients.items():
+    print(f"Vértice: {node + 1}, Coeficiente de aglomeração: {coeff:.3f}")
+
+# calcula o coeficiente de aglomeração médio
+average_clustering = nx.average_clustering(graph)
+print(f"\nThe average clustering coefficient of the graph: {average_clustering:.3f}")
+
+# incialização para 3d
 pos = nx.spring_layout(graph, dim=3, seed=779)
-# Extract node and edge positions from the layout
+# extrai vértices e arestas
 node_xyz = np.array([pos[v] for v in sorted(graph)])
 edge_xyz = np.array([(pos[u], pos[v]) for u, v in graph.edges()])
 
-# Create the 3D figure
 fig = plt.figure()
 ax = fig.add_subplot(111, projection="3d")
 
-# Plot the nodes - alpha is scaled by "depth" automatically
+# plota os vértices
 ax.scatter(*node_xyz.T, s=100, ec="w")
 
-# Plot the edges
+# Plota as arestas
 for vizedge in edge_xyz:
     ax.plot(*vizedge.T, color="tab:gray")
 
 
 def _format_axes(ax):
     """Visualization options for the 3D axes."""
-    # Turn gridlines off
+    # remove os alinhamentos
     ax.grid(False)
-    # Suppress tick labels
+
     for dim in (ax.xaxis, ax.yaxis, ax.zaxis):
         dim.set_ticks([])
-    # Set axes labels
+
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")
