@@ -2,6 +2,11 @@
 
 Este projeto é uma ferramenta em Python para análise de grafos, incluindo cálculos de graus dos vértices, coeficientes de aglomeração, cliques maximais e visualizações do grafo em 3D.
 
+## Alunos
+
+- Henrique Valente Lima (211055380)
+- Gabriel Brito Franca (211020867)
+
 ## Funcionalidades
 
 - Calcula o grau de cada vértice.
